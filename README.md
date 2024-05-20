@@ -2,6 +2,13 @@
 
 Algorytm CFPKM (Cross-Fire Prime Key Exchange) to algorytm wymiany kluczy kryptograficznych, który wykorzystuje wielomiany jako główny mechanizm bezpieczeństwa. W skrócie, polega on na wymianie klucza publicznego między dwoma stronom i generowaniu wspólnego sekretu, który może być następnie wykorzystany do bezpiecznej komunikacji.
 
+Algorytm CFPKM jest oparty na teorii wielomianów, a kluczową koncepcją jest ocena wielomianów przy użyciu losowych wartości oraz operacje na wielomianach. Bezpieczeństwo algorytmu opiera się na trudności rozwiązania problemu wielomianów nad ciałem skończonym.
+
+Najważniejsze elementy algorytmu CFPKM:
+•	Generowanie kluczy: Algorytm rozpoczyna się od wygenerowania pary kluczy: klucza prywatnego i klucza publicznego. Klucz prywatny jest przechowywany tylko przez jedną stronę, podczas gdy klucz publiczny jest udostępniany drugiej stronie do celów szyfrowania.
+•	Szyfrowanie: Aby zaszyfrować wiadomość dla drugiej strony, strona wysyłająca używa klucza publicznego drugiej strony do przekształcenia wiadomości. Ten proces obejmuje ocenę wielomianów na podstawie losowych wartości oraz dodanie błędów dla zwiększenia bezpieczeństwa.
+•	Deszyfrowanie: Strona docelowa otrzymuje zaszyfrowaną wiadomość i używa swojego klucza prywatnego do odtworzenia wspólnego sekretu, który następnie może być wykorzystany do odszyfrowania wiadomości.
+
 Opis funkcji:
 
 __init__ (klasa Pol):
