@@ -1,29 +1,24 @@
 """
-Compression and decompression routines for signatures.
+Metoda compress kompresuje listę całkowitych v do ciągu bajtów o długości slen.
+Każdy współczynnik v jest kodowany w następujący sposób:
+
+ - Znak (dodatni lub ujemny) jest kodowany na 1 bicie.
+ - 7 najmniej znaczących bitów współczynnika jest kodowanych binarnie.
+ - Najbardziej znaczące bity są kodowane w kodowaniu unarnym (jeden bit 1 na końcu).
+
+Jeśli skompresowany ciąg jest dłuższy niż slen bajtów, funkcja zwraca False.
 """
 
-
 def compress(v, slen):
-    """
-    Take as input a list of integers v and a bytelength slen, and
-    return a bytestring of length slen that encode/compress v.
-    If this is not possible, return False.
-
-    For each coefficient of v:
-    - the sign is encoded on 1 bit
-    - the 7 lower bits are encoded naively (binary)
-    - the high bits are encoded in unary encoding
-    """
     u = ""
     for coef in v:
-        # Encode the sign
+        # Kodowanie znaku
         s = "1" if coef < 0 else "0"
-        # Encode the low bits
+        # Kodowanie niskich bitów
         s += format((abs(coef) % (1 << 7)), '#09b')[2:]
-        # Encode the high bits
+        # Kodowanie wysokich bitów
         s += "0" * (abs(coef) >> 7) + "1"
         u += s
-    # The encoding is too long
     if len(u) > 8 * slen:
         return False
     u += "0" * (8 * slen - len(u))
@@ -31,15 +26,15 @@ def compress(v, slen):
     x = bytes(w)
     return x
 
-
+"""
+Metoda decompress dekompresuje ciąg bajtów x do listy całkowitych v o długości n.
+Przyjmuje jako argumenty kodowanie x, długość w bajtach slen i długość n oczekiwanego wyniku.
+Jeśli długość x przekracza slen lub dekompresja nie jest możliwa, funkcja zwraca False.
+"""
 def decompress(x, slen, n):
-    """
-    Take as input an encoding x, a bytelength slen and a length n, and
-    return a list of integers v of length n such that x encode v.
-    If such a list does not exist, the encoding is invalid and we output False.
-    """
+    # Sprawdzenie, czy długość x przekracza slen
     if (len(x) > slen):
-        print("Too long")
+        print("Za długie")
         return False
     w = list(x)
     u = ""
@@ -47,33 +42,33 @@ def decompress(x, slen, n):
         u += bin((1 << 8) ^ elt)[3:]
     v = []
 
-    # Remove the last bits
+    # Usuń ostatnie bity
     while u[-1] == "0":
         u = u[:-1]
 
     try:
         while (u != "") and (len(v) < n):
-            # Recover the sign of coef
+            # Odzyskaj znak współczynnika
             sign = -1 if u[0] == "1" else 1
-            # Recover the 7 low bits of abs(coef)
+            # Odzyskaj 7 niskich bitów abs(coef)
             low = int(u[1:8], 2)
             i, high = 8, 0
-            # Recover the high bits of abs(coef)
+            # Odzyskaj wysokie bity abs(coef)
             while (u[i] == "0"):
                 i += 1
                 high += 1
-            # Compute coef
+            # Oblicz współczynnik
             coef = sign * (low + (high << 7))
-            # Enforce a unique encoding for coef = 0
+            # Wymuś unikalne kodowanie dla coef = 0
             if (coef == 0) and (sign == -1):
                 return False
-            # Store intermediate results
+            # Przechowaj wyniki pośrednie
             v += [coef]
             u = u[i + 1:]
-        # In this case, the encoding is invalid
+        # W tym przypadku kodowanie jest nieprawidłowe
         if (len(v) != n):
             return False
         return v
-    # IndexError is raised if indices are read outside the table bounds
+    # IndexError jest zgłaszany, gdy indeksy są poza zakresem tablicy
     except IndexError:
         return False
